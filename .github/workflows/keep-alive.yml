@@ -1,0 +1,19 @@
+name: Keep Render Awake
+
+on:
+  schedule:
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Vantage Ceylon
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 60 -A "Mozilla/5.0" https://vantageceylon.onrender.com/)
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" -ge 400 ] || [ "$STATUS" -eq 000 ]; then
+            echo "Ping failed with status $STATUS"
+            exit 1
+          fi
